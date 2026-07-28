@@ -4,14 +4,15 @@
 # ==============================================================================
 
 # --- Deep Learning & Visión ---------------------------------------------------
-torch==2.3.1
-torchvision==0.18.1
+# torch fijado en la serie 2.2.x porque facenet-pytorch 2.6.0 exige torch<2.3.0
+torch==2.2.2
+torchvision==0.17.2         # pareja oficial compatible con torch 2.2.2
 timm==1.0.7                 # backbones preentrenados (EfficientNet, etc.)
 opencv-python-headless==4.10.0.84   # headless: sin dependencias de GUI en servidor
 facenet-pytorch==2.6.0      # MTCNN para detección/alineación de rostros
 numpy==1.26.4
 scipy==1.13.1
-Pillow==10.4.0
+Pillow==10.2.0               # <10.3.0 requerido por facenet-pytorch 2.6.0
 
 # --- Backend & API -------------------------------------------------------------
 Django==5.0.7
