@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import numpy as np
@@ -42,12 +43,22 @@ class TestComputeFrequencySpectrum:
         assert edge_energy_checkerboard > edge_energy_flat
 
 
+def _fake_face(bbox: list[float], det_score: float, kps: list[list[float]]) -> SimpleNamespace:
+    """Imita el objeto `Face` que devuelve `insightface.app.FaceAnalysis.get()`
+    (solo los atributos que usa `FaceExtractor`: bbox, det_score, kps)."""
+    return SimpleNamespace(
+        bbox=np.array(bbox, dtype=np.float32),
+        det_score=det_score,
+        kps=np.array(kps, dtype=np.float32),
+    )
+
+
 class TestFaceExtractor:
     def test_raises_when_no_face_is_detected(self) -> None:
         extractor = FaceExtractor(image_size=112, device="cpu")
         blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
 
-        with patch.object(extractor._mtcnn, "detect", return_value=(None, None, None)):
+        with patch.object(extractor._app, "get", return_value=[]):
             with pytest.raises(NoFaceDetectedError):
                 extractor.extract(blank_image)
 
@@ -64,18 +75,20 @@ class TestFaceExtractor:
         extractor = FaceExtractor(image_size=64, device="cpu")
         source_image = np.random.randint(0, 256, size=(200, 200, 3), dtype=np.uint8)
 
-        boxes = np.array([[0, 0, 50, 50], [60, 60, 150, 150]])
-        probs = np.array([0.55, 0.97])
-        landmarks = np.array(
-            [
-                [[10, 10], [40, 10], [25, 25], [15, 40], [35, 40]],
-                [[80, 80], [130, 80], [105, 105], [90, 130], [120, 130]],
-            ]
+        low_confidence = _fake_face(
+            bbox=[0, 0, 50, 50],
+            det_score=0.55,
+            kps=[[10, 10], [40, 10], [25, 25], [15, 40], [35, 40]],
+        )
+        high_confidence = _fake_face(
+            bbox=[60, 60, 150, 150],
+            det_score=0.97,
+            kps=[[80, 80], [130, 80], [105, 105], [90, 130], [120, 130]],
         )
 
-        with patch.object(extractor._mtcnn, "detect", return_value=(boxes, probs, landmarks)):
+        with patch.object(extractor._app, "get", return_value=[low_confidence, high_confidence]):
             result = extractor.extract(source_image)
 
         assert result.confidence == pytest.approx(0.97)
-        assert result.box == tuple(float(v) for v in boxes[1])
+        assert result.box == (60.0, 60.0, 150.0, 150.0)
         assert result.face.shape == (64, 64, 3)

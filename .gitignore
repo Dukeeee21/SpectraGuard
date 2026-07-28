@@ -25,6 +25,10 @@ ml/weights/*.pt
 ml/weights/*.onnx
 !ml/weights/.gitkeep
 
+# --- Dataset de entrenamiento (varios GB, no va al repo) ---
+/data/
+/data_raw/
+
 # --- IDE ---
 .idea/
 .vscode/

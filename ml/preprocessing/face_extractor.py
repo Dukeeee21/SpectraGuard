@@ -3,6 +3,12 @@
 Este módulo no depende de Django: recibe una imagen en memoria y devuelve un
 array de numpy, para poder testearse y reutilizarse igual en un script de
 entrenamiento que en el servicio de inferencia de la API (Fase 4).
+
+Usa insightface (RetinaFace vía ONNX Runtime) en vez de MTCNN
+(facenet-pytorch): da los mismos 5 landmarks faciales que necesitamos para
+alinear, pero corre sobre ONNX Runtime en lugar de PyTorch, así la versión
+de torch del proyecto queda libre para actualizarse (p. ej. para dar
+soporte a GPUs nuevas) sin quedar atada a lo que exija esta librería.
 """
 
 from __future__ import annotations
@@ -11,7 +17,7 @@ from dataclasses import dataclass
 
 import cv2
 import numpy as np
-from facenet_pytorch import MTCNN
+from insightface.app import FaceAnalysis
 from PIL import Image
 
 # Posiciones canónicas de los ojos dentro del recorte de salida cuadrado,
@@ -22,47 +28,69 @@ from PIL import Image
 _CANONICAL_LEFT_EYE = (0.35, 0.35)
 _CANONICAL_RIGHT_EYE = (0.65, 0.35)
 
+# 320x320 balancea calidad de detección y velocidad: en pruebas, 640x640
+# (el default recomendado por insightface para fotos de alta resolución)
+# degradaba fuerte la detección en imágenes de dataset ya redimensionadas a
+# 224x224 -- sobre-escalarlas introduce blur que confunde al detector.
+_DEFAULT_DET_SIZE = (320, 320)
+_DEFAULT_DET_THRESHOLD = 0.3
+
 
 class NoFaceDetectedError(RuntimeError):
-    """La imagen de entrada no contiene ningún rostro detectable por MTCNN."""
+    """La imagen de entrada no contiene ningún rostro detectable."""
 
 
 @dataclass(frozen=True)
 class FaceExtractionResult:
     face: np.ndarray  # HxWx3 uint8 RGB, alineado y recortado a `image_size`
-    confidence: float  # probabilidad de detección del rostro elegido, en [0, 1]
+    confidence: float  # confianza de detección del rostro elegido, en [0, 1]
     box: tuple[float, float, float, float]  # bounding box original (x1, y1, x2, y2)
 
 
 class FaceExtractor:
-    """Envuelve MTCNN (facenet-pytorch) para detectar, alinear por landmarks
-    oculares y recortar el rostro principal de una imagen."""
+    """Detecta, alinea por landmarks oculares y recorta el rostro principal
+    de una imagen."""
 
     def __init__(self, image_size: int = 224, device: str = "cpu") -> None:
         self.image_size = image_size
-        # keep_all=True: pedimos todos los rostros detectados (con sus
-        # landmarks) para elegir nosotros el de mayor confianza, en vez de
-        # depender del criterio "el más grande" que usa MTCNN por defecto.
-        self._mtcnn = MTCNN(keep_all=True, device=device)
+
+        is_gpu = device.startswith("cuda")
+        providers = (
+            ["CUDAExecutionProvider", "CPUExecutionProvider"]
+            if is_gpu
+            else ["CPUExecutionProvider"]
+        )
+
+        # allowed_modules=["detection"]: solo cargamos RetinaFace. Los demás
+        # modelos del paquete "buffalo_l" (reconocimiento, edad/género, 106
+        # landmarks) no hacen falta para recortar y alinear un rostro.
+        self._app = FaceAnalysis(
+            name="buffalo_l", allowed_modules=["detection"], providers=providers
+        )
+        self._app.prepare(
+            ctx_id=0 if is_gpu else -1,
+            det_size=_DEFAULT_DET_SIZE,
+            det_thresh=_DEFAULT_DET_THRESHOLD,
+        )
 
     def extract(self, image: Image.Image | np.ndarray) -> FaceExtractionResult:
         """Detecta el rostro de mayor confianza en `image` y devuelve su
         recorte alineado. Lanza `NoFaceDetectedError` si no hay ninguno."""
-        pil_image = self._to_pil_rgb(image)
+        rgb_image = np.array(self._to_pil_rgb(image))
+        bgr_image = rgb_image[:, :, ::-1]  # insightface espera BGR (convención OpenCV)
 
-        boxes, probs, landmarks = self._mtcnn.detect(pil_image, landmarks=True)
-        if boxes is None:
+        faces = self._app.get(bgr_image)
+        if not faces:
             raise NoFaceDetectedError("No se detectó ningún rostro en la imagen.")
 
-        best_index = int(np.argmax(probs))
-        box = boxes[best_index]
-        eyes = landmarks[best_index][:2]  # [ojo_1, ojo_2] en coordenadas de imagen
+        best = max(faces, key=lambda f: f.det_score)
+        eyes = best.kps[:2]  # [ojo_1, ojo_2] en coordenadas de imagen
 
-        aligned = self._align(np.array(pil_image), eyes)
-        x1, y1, x2, y2 = (float(v) for v in box)
+        aligned = self._align(rgb_image, eyes)
+        x1, y1, x2, y2 = (float(v) for v in best.bbox)
         return FaceExtractionResult(
             face=aligned,
-            confidence=float(probs[best_index]),
+            confidence=float(best.det_score),
             box=(x1, y1, x2, y2),
         )
 
