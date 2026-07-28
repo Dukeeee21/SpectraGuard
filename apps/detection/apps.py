@@ -7,6 +7,6 @@ class DetectionConfig(AppConfig):
     verbose_name = "AI Image Detection"
 
     def ready(self) -> None:
-        # Fase 4: aquí se cargará el modelo PyTorch preentrenado en memoria
-        # una sola vez al arrancar Django (evita recargarlo en cada request).
-        pass
+        from apps.detection.services import inference
+
+        inference.load_predictor()

@@ -9,7 +9,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      # Host 5433 -> contenedor 5432: en esta máquina el 5432 ya lo ocupa
+      # un PostgreSQL nativo de Windows ajeno a este proyecto.
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-spectraguard_user}"]
       interval: 5s
@@ -23,8 +25,10 @@ services:
       - .env
     environment:
       # Dentro de la red de Docker, la base de datos se resuelve por nombre
-      # de servicio ("db"), no por localhost.
+      # de servicio ("db") y por su puerto interno (5432), sin importar a
+      # qué puerto del host esté mapeado hacia afuera.
       POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
     depends_on:
       db:
         condition: service_healthy

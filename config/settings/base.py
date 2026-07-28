@@ -7,6 +7,7 @@ Por qué separar settings en base/development/production:
     restringidos) sin riesgo de que un desarrollador los sobreescriba
     accidentalmente en local.
 """
+
 from pathlib import Path
 
 import environ
@@ -125,7 +126,8 @@ SPECTACULAR_SETTINGS = {
 # de inferencia (apps/detection/services/inference.py, Fase 4) y los scripts
 # de entrenamiento (ml/training/, Fase 3) lean la misma fuente de verdad.
 ML_MODEL = {
-    "WEIGHTS_PATH": BASE_DIR / env("MODEL_WEIGHTS_PATH", default="ml/weights/hybrid_detector_v1.pth"),
+    "WEIGHTS_PATH": BASE_DIR
+    / env("MODEL_WEIGHTS_PATH", default="ml/weights/hybrid_detector_v1.pth"),
     "DEVICE": env("MODEL_DEVICE", default="cpu"),
     "IMAGE_SIZE": env.int("INFERENCE_IMAGE_SIZE", default=224),
 }

@@ -2,6 +2,7 @@
 URL raíz del proyecto. Las rutas de la API viven en apps/detection/urls.py
 (Fase 4) y se montan aquí bajo el prefijo /api/v1/.
 """
+
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
