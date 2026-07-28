@@ -39,6 +39,14 @@ services:
     ports:
       - "8000:8000"
 
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "5173:80"
+
 volumes:
   postgres_data:
   media_data:

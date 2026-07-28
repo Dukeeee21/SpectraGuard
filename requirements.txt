@@ -10,20 +10,27 @@
 # los nightly con CUDA 12.8+. Si esta máquina no tiene una RTX 50-series (o
 # cuando PyTorch estabilice el soporte), usar la versión estable en su lugar:
 #   pip install torch==2.2.2 torchvision==0.17.2
-# El build nightly exacto puede dejar de existir en el índice con el tiempo
-# (se van purgando); si esta línea falla, reinstalar con:
-#   pip install --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cu128
+# Deliberadamente SIN fijar la fecha exacta del nightly (ni siquiera el mismo
+# comando resuelve igual entre plataformas: torch y torchvision se publican
+# como snapshots diarios independientes, y Windows/Linux no siempre quedan
+# en el mismo día — fijar fechas exactas rompe el build cruzado, como pasó
+# acá). Dejar que pip resuelva el par mutuamente compatible más reciente
+# en cada plataforma es más confiable que perseguir una fecha fija.
 --extra-index-url https://download.pytorch.org/whl/nightly/cu128
-torch==2.12.0.dev20260408+cu128
-torchvision==0.27.0.dev20260407+cu128
+--pre
+torch
+torchvision
 
 timm==1.0.7                 # backbones preentrenados (EfficientNet, etc.)
 opencv-python-headless==4.10.0.84   # headless: sin dependencias de GUI en servidor
-# `pip check` va a marcar "insightface requires opencv-python" — es un falso
-# positivo: opencv-python-headless provee el mismo paquete `cv2`, solo que
-# sin los bindings de GUI que no usamos (y que no queremos en Docker).
+# insightface declara "opencv-python" (con GUI) como dependencia. Cada vez
+# que se reinstale este archivo completo, pip puede traer esa variante
+# encima de la headless de acá arriba (el Dockerfile ya lo corrige solo).
+# Si pasa en el venv local, forzar de nuevo con:
+#   pip uninstall -y opencv-python
+#   pip install --force-reinstall --no-deps opencv-python-headless==4.10.0.84
 insightface==1.0.1          # RetinaFace para detección/alineación de rostros (ONNX, no depende de torch)
-onnxruntime-gpu==1.28.0     # backend de insightface; usa CUDA propio, aunque falle el import de GPU cae a CPU
+onnxruntime-gpu==1.27.0     # backend de insightface; 1.28.0 no publica wheel Linux (rompe el build de Docker)
 numpy==2.2.6                 # insightface exige numpy>=2
 scipy==1.13.1
 Pillow==10.2.0

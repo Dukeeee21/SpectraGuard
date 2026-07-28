@@ -1,6 +1,10 @@
 import type { AnalysisError, AnalysisResult } from "../types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+// Vacío por defecto: rutas relativas ("/api/v1/analyze/"), resueltas por el
+// proxy del servidor de dev de Vite en local y por nginx dentro de Docker
+// (ver vite.config.ts y frontend/nginx.conf) — mismo origen, sin CORS.
+// Solo hace falta setear VITE_API_BASE_URL si la API vive en otro dominio.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 function errorKindForStatus(status: number): AnalysisError["kind"] {
   if (status === 422) return "no_face";

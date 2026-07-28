@@ -18,7 +18,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir -r requirements.txt \
+    # insightface declara "opencv-python" (con GUI) como dependencia y pip
+    # lo instala encima del opencv-python-headless de requirements.txt. La
+    # imagen slim no tiene libGL.so.1 (no instalado a propósito, no hace
+    # falta para uso headless), así que si el paquete con GUI queda instalado
+    # "import cv2" falla en runtime. Se fuerza headless después, sin deps.
+    && pip uninstall -y opencv-python \
+    && pip install --no-cache-dir --no-deps --force-reinstall opencv-python-headless==4.10.0.84
 
 COPY . .
 
