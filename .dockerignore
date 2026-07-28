@@ -1,0 +1,15 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.env
+media/
+staticfiles/
+ml/weights/*.pth
+ml/weights/*.pt
+.mypy_cache/
+.pytest_cache/
+.idea/
+.vscode/

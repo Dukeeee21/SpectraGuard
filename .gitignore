@@ -1,0 +1,34 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+
+# --- Entornos virtuales ---
+venv/
+.venv/
+env/
+
+# --- Variables de entorno / secretos ---
+.env
+
+# --- Django ---
+*.log
+db.sqlite3
+staticfiles/
+media/
+
+# --- Modelos ML (pesos pesados: no van al repo, usar almacenamiento externo / DVC / S3) ---
+ml/weights/*.pth
+ml/weights/*.pt
+ml/weights/*.onnx
+!ml/weights/.gitkeep
+
+# --- IDE ---
+.idea/
+.vscode/
+
+# --- OS ---
+.DS_Store
+Thumbs.db

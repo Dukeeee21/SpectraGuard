@@ -1,0 +1,38 @@
+# ==============================================================================
+# SpectraGuard — Deepfake / AI-Generated Image Detection System
+# requirements.txt
+# ==============================================================================
+
+# --- Deep Learning & Visión ---------------------------------------------------
+torch==2.3.1
+torchvision==0.18.1
+timm==1.0.7                 # backbones preentrenados (EfficientNet, etc.)
+opencv-python-headless==4.10.0.84   # headless: sin dependencias de GUI en servidor
+facenet-pytorch==2.6.0      # MTCNN para detección/alineación de rostros
+numpy==1.26.4
+scipy==1.13.1
+Pillow==10.4.0
+
+# --- Backend & API -------------------------------------------------------------
+Django==5.0.7
+djangorestframework==3.15.2
+django-cors-headers==4.4.0
+drf-spectacular==0.27.2     # documentación OpenAPI/Swagger del endpoint
+django-environ==0.11.2      # gestión de variables de entorno (.env)
+gunicorn==22.0.0            # servidor WSGI de producción
+
+# --- Base de Datos ---------------------------------------------------------------
+psycopg2-binary==2.9.9
+
+# --- Utilidades ------------------------------------------------------------------
+python-dotenv==1.0.1
+tqdm==4.66.4
+
+# --- Testing & Calidad de código --------------------------------------------------
+pytest==8.2.2
+pytest-django==4.8.0
+factory-boy==3.3.1
+black==24.4.2
+flake8==7.1.0
+mypy==1.10.1
+django-stubs==5.0.2

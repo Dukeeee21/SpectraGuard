@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.plugin"]
+python_version = "3.11"
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.development"
