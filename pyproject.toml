@@ -3,7 +3,7 @@ line-length = 100
 target-version = ["py311"]
 
 [tool.mypy]
-plugins = ["mypy_django_plugin.plugin"]
+plugins = ["mypy_django_plugin.main"]
 python_version = "3.11"
 ignore_missing_imports = true
 
