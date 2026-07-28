@@ -1,0 +1,148 @@
+/*
+  SpectraGuard design tokens.
+
+  Paleta de estado (good/warning/serious/critical) y rampa secuencial azul
+  tomadas del set validado del equipo de diseño (contraste + seguridad CVD
+  verificados con el validador) — no se retocan. El resto (acento de marca,
+  superficies, tipografía) es la identidad propia del producto: "instrumento
+  espectral", ligado a que el backend literalmente analiza espectros DFT.
+*/
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* --- Superficies -------------------------------------------------- */
+  --plane: #05070b;
+  --surface-1: #0b0e14;
+  --surface-2: #10141d;
+  --surface-3: #171c28;
+  --border-hairline: rgba(148, 197, 210, 0.12);
+  --border-strong: rgba(148, 197, 210, 0.28);
+
+  /* --- Tinta ----------------------------------------------------------- */
+  --ink-primary: #eef4f6;
+  --ink-secondary: #9fb0bd;
+  --ink-muted: #5c6b78;
+
+  /* --- Acento de marca (cian espectral) ------------------------------- */
+  --brand-100: #cdfdf6;
+  --brand-300: #6fe4d6;
+  --brand-500: #2dd4bf;
+  --brand-600: #17a897;
+  --brand-700: #0f7d70;
+  --brand-glow: rgba(45, 212, 191, 0.35);
+
+  /* --- Acento cálido (barrido / escaneo) ------------------------------ */
+  --scan-500: #f5a623;
+  --scan-700: #b9760f;
+
+  /* --- Paleta de estado (fija, validada) ------------------------------ */
+  --status-good: #0ca30c;
+  --status-good-dim: rgba(12, 163, 12, 0.16);
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --status-critical-dim: rgba(208, 59, 59, 0.16);
+
+  /* --- Rampa secuencial (azul, validada) ------------------------------ */
+  --seq-100: #cde2fb;
+  --seq-300: #6da7ec;
+  --seq-500: #256abf;
+  --seq-700: #0d366b;
+
+  /* --- Tipografía -------------------------------------------------- */
+  --font-ui:
+    "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:
+    "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* --- Espaciado / radios ------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* Modo claro: se define para completitud/accesibilidad (preferencia de
+   sistema o toggle futuro), aunque el modo por defecto del producto es
+   oscuro -- coherente con la estética de instrumento de laboratorio. */
+@media (prefers-color-scheme: light) {
+  :root:where(:not([data-theme="dark"])) {
+    color-scheme: light;
+    --plane: #f9f9f7;
+    --surface-1: #fcfcfb;
+    --surface-2: #f3f3f1;
+    --surface-3: #ececea;
+    --border-hairline: #e1e0d9;
+    --border-strong: #c3c2b7;
+
+    --ink-primary: #0b0b0b;
+    --ink-secondary: #52514e;
+    --ink-muted: #898781;
+
+    --brand-100: #d6f7f2;
+    --brand-300: #33bfae;
+    --brand-500: #17a897;
+    --brand-600: #0f7d70;
+    --brand-700: #0a5c53;
+    --brand-glow: rgba(23, 168, 151, 0.22);
+
+    --scan-500: #c98500;
+    --scan-700: #9c6800;
+
+    --status-good: #0ca30c;
+    --status-good-dim: rgba(12, 163, 12, 0.1);
+    --status-warning: #fab219;
+    --status-serious: #ec835a;
+    --status-critical: #d03b3b;
+    --status-critical-dim: rgba(208, 59, 59, 0.1);
+
+    --seq-100: #cde2fb;
+    --seq-300: #6da7ec;
+    --seq-500: #256abf;
+    --seq-700: #0d366b;
+
+    --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 20px 40px -24px rgba(11, 11, 11, 0.18);
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --plane: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --surface-2: #f3f3f1;
+  --surface-3: #ececea;
+  --border-hairline: #e1e0d9;
+  --border-strong: #c3c2b7;
+
+  --ink-primary: #0b0b0b;
+  --ink-secondary: #52514e;
+  --ink-muted: #898781;
+
+  --brand-100: #d6f7f2;
+  --brand-300: #33bfae;
+  --brand-500: #17a897;
+  --brand-600: #0f7d70;
+  --brand-700: #0a5c53;
+  --brand-glow: rgba(23, 168, 151, 0.22);
+
+  --scan-500: #c98500;
+  --scan-700: #9c6800;
+
+  --status-good: #0ca30c;
+  --status-good-dim: rgba(12, 163, 12, 0.1);
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --status-critical-dim: rgba(208, 59, 59, 0.1);
+}
