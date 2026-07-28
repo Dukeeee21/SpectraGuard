@@ -28,6 +28,7 @@ psycopg2-binary==2.9.9
 # --- Utilidades ------------------------------------------------------------------
 python-dotenv==1.0.1
 tqdm==4.66.4
+PyYAML==6.0.3                # lee ml/training/config.yaml
 
 # --- Testing & Calidad de código --------------------------------------------------
 pytest==8.2.2

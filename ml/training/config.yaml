@@ -1,5 +1,7 @@
-# Hiperparámetros de entrenamiento (placeholder — se completa junto con train.py)
+# Hiperparámetros de entrenamiento, leídos por ml/training/train.py
 image_size: 224
 batch_size: 32
 epochs: 30
 learning_rate: 0.0001
+val_fraction: 0.2
+seed: 42
